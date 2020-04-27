@@ -38,7 +38,7 @@ Do
 ```
 make deps
 ```
-To install all dependencies (GOPATH used to everything self-contained)
+To install all dependencies (GOPATH used so everything self-contained)
 
 To build you can use the Makefile
 ```
@@ -54,6 +54,11 @@ make likeswipe
 ```
 
 Edit the source files to add your Postgresql database information.
+
+Reference URLs:
+- [Twitter Rate Limits](https://developer.twitter.com/en/docs/basics/rate-limits)
+- [Tweet objects](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object)
+- [Sample Tweet Object](https://github.com/twitterdev/tweet-updates/blob/master/samples/initial/compatibility_extended_13996.json)
 
 Have fun,
 
