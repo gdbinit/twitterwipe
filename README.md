@@ -26,19 +26,13 @@ able to delete some 70k tweets without any problems. It took a while since
 this is single threaded and single request since otherwise I could hit
 some rate limitation on Twitter side.
 
-Sorry, no go mod support yet, didn't have time yet to understand how to use
-that stuff.
+Go mod is now used and all vendor dependencies in the repo to assure reproducible
+build. Use -mod=mod if you want to download or use your local cache.
 
 External main dependencies (and whatever else each project uses):
 - [libpq](https://github.com/lib/pq)
 - [oauth1](https://github.com/dghubble/oauth1)
 - [go-twitter](https://github.com/dghubble/go-twitter/twitter)
-
-Do
-```
-make deps
-```
-To install all dependencies (GOPATH used so everything self-contained)
 
 To build you can use the Makefile
 ```
