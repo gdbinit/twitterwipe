@@ -1,59 +1,106 @@
-A quick Go hack to parse Twitter's JSON archive and delete all Tweets.
+### About
 
-Made because all alternatives appear to be online services and that looks
-like a very dumb idea to give access to some random website :-).
-And I needed some Go project to start using it and Go is great to deal with
-JSON.
+An utility to parse Twitter's JSON archives and delete tweets, likes and direct messages.
 
-**tweetstosql** parses the `tweet.js` file you get and dumps all the tweets
-`id` to a Postgresql database (modify to whatever else you use)
-
-**twitterwipe** queries the database and issues the API calls to delete the
-tweets
-
-And versions for likes (which use a different ID). Could be easily merged into
-a single utility but this was originally a hack and just cleaned it a bit for
-this release. You can practice your Go skills improving this :-).
-
-Just request your Twitter archive, and point the SQL extractors to the `tweet.js`
-and `like.js` files that are included in the archive.
-
-You need a Twitter API key. I had an old one, not sure it's still easy to request
-one or you need to justify and wait a bit more for it.
-
-I was afraid of API rate limitations as described in documentation but I was
-able to delete some 70k tweets without any problems. It took a while since
-this is single threaded and single request since otherwise I could hit
-some rate limitation on Twitter side.
-
-Go mod is now used and all vendor dependencies in the repo to assure reproducible
-build. Use -mod=mod if you want to download or use your local cache.
-
-External main dependencies (and whatever else each project uses):
-- [libpq](https://github.com/lib/pq)
-- [oauth1](https://github.com/dghubble/oauth1)
-- [go-twitter](https://github.com/dghubble/go-twitter/twitter)
-
-To build you can use the Makefile
-```
-make all
-```
-
-or
-```
-make tweetstosql
-make twitterwipe
-make likestosql
-make likeswipe
-```
-
-Edit the source files to add your Postgresql database information.
-
-Reference URLs:
-- [Twitter Rate Limits](https://developer.twitter.com/en/docs/basics/rate-limits)
-- [Tweet objects](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object)
-- [Sample Tweet Object](https://github.com/twitterdev/tweet-updates/blob/master/samples/initial/compatibility_extended_13996.json)
+Made because all alternatives appear to be online services and that looks like a very dumb idea to give access to some random website :-).
 
 Have fun,
 
 fG!
+
+### Requirements
+
+Just request your Twitter archive (**Settings -> Your Account -> Download an archive of your data**), and point the import command to the proper files included in the archive.
+
+* `tweet.js`: contains all your tweets and retweets
+* `like.js`: contains all your likes
+* `direct-messages.js`: contains all your direct messags threads
+
+You need a Twitter API key from [Twitter developer](https://developer.twitter.com). I had an old one, not sure if it's still easy to request or you need to justify and wait for authorization.
+
+You will need to create a `config.json` file with the API keys information. Hardcoded credentials is not a good idea :P.
+
+```
+{
+    "consumerkey": "INSERT CONSUMER KEY HERE",
+    "consumersecret": "INSERT CONSUMER SECRET HERE",
+    "accesstoken": "INSERT ACCESS TOKEN HERE",
+    "accesstokensecret": "INSERT ACCESS TOKEN SECRET HERE"
+}
+```
+
+The `config.json` should be on the same folder as the main binary.
+
+I was afraid of API rate limitations as described in documentation but I was able to delete some 70k tweets without any problems. It took a while since this is single threaded and single request since otherwise I could hit some rate limitation on Twitter side.
+
+The `delete` command has a `-l` flag to limit the number of items deleted if you manage to hit limits.
+
+### Building
+
+To build you can use the Makefile
+```
+make
+```
+
+Or
+
+```go
+go build -o twitterwipe main.go
+```
+
+Tested only in macOS, should work in other OSes because Go promises that.
+
+### Usage
+
+#### Import
+
+First step is to import the ids into the local database using the `import` command.
+
+```bash
+twitterwipe import tweets tweet.js
+```
+
+Available commands to `import` are `tweets`, `likes`, `dms`.
+
+The files in the archive are not straight JSON parseable by Go `encoding/json` package but the code deals with it so you can use those files without a problem.
+
+#### Delete
+
+The next step is to remove the data from Twitter using the `delete` command.
+
+```bash
+twitterwipe delete tweets
+```
+
+Available commands to `delete` are `tweets`, `likes`, `dms`.
+
+The `-l` or `--limit` flag is available to limit the maximum number of items to delete (in case if you hit Twitter rate limitation, which I never did).
+
+#### Status
+
+The `status` command displays how many ids currently exist in the database.
+
+```bash
+twitterwipe status
+```
+
+### TODO
+
+Maybe...
+
+- [] Delete by individual ID
+- [] Import IDs via Twitter API (rate limited afaik!)
+
+### Bill of Materials
+
+- [oauth1](https://github.com/dghubble/oauth1)
+- [go-twitter](https://github.com/dghubble/go-twitter/twitter)
+- [progressbar](https://github.com/schollz/progressbar)
+- [cobra](https://github.com/spf13/cobra)
+- [boltdb](https://github.com/boltdb/bolt)
+
+### References
+
+- [Twitter Rate Limits](https://developer.twitter.com/en/docs/basics/rate-limits)
+- [Tweet objects](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object)
+- [Sample Tweet Object](https://github.com/twitterdev/tweet-updates/blob/master/samples/initial/compatibility_extended_13996.json)
