@@ -9,7 +9,7 @@
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- 
+
  * 1. Redistributions of source code must retain the above copyright notice, this list
  * of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -38,11 +38,11 @@
 package twitter
 
 import (
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
-    t "github.com/dghubble/go-twitter/twitter"
-    "github.com/dghubble/oauth1"
+	"fmt"
+	t "github.com/dghubble/go-twitter/twitter"
+	"github.com/dghubble/oauth1"
+	"io/ioutil"
 )
 
 type Client struct {
@@ -51,58 +51,58 @@ type Client struct {
 
 // read the tokens from a config file to avoid hardcoding secrets!
 type Secrets struct {
-	ConsumerKey string `json:"consumerkey"`
-	ConsumerSecret string `json:"consumersecret"`
-	AccessToken string `json:"accesstoken"`
+	ConsumerKey       string `json:"consumerkey"`
+	ConsumerSecret    string `json:"consumersecret"`
+	AccessToken       string `json:"accesstoken"`
 	AccessTokenSecret string `json:"accesstokensecret`
 }
 
 func Open() (*Client, error) {
-    var err error
-    dat, err := ioutil.ReadFile("config.json")
-    if err != nil {
-    	return nil, fmt.Errorf("failed to read config.json")
-    }
+	var err error
+	dat, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config.json")
+	}
 
-    s := new(Secrets)
-    err = json.Unmarshal(dat, s)
-    if err != nil {
-    	return nil, fmt.Errorf("failed to unmarshal config.json")	
-    }
+	s := new(Secrets)
+	err = json.Unmarshal(dat, s)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal config.json")
+	}
 
-    // connect to Twitter API
-    config := oauth1.NewConfig(s.ConsumerKey, s.ConsumerSecret)
-    token := oauth1.NewToken(s.AccessToken, s.AccessTokenSecret)
-    // OAuth1 http.Client will automatically authorize Requests
-    httpClient := config.Client(oauth1.NoContext, token)
-    // Twitter client
-    c := &Client{}
-    c.client = t.NewClient(httpClient)
-    
-    // Verify Credentials
-    // Not really necessary - just debug so comment out after everything works
-    verifyParams := &t.AccountVerifyParams{
-        SkipStatus:   t.Bool(true),
-        IncludeEmail: t.Bool(true),
-    }
-    _, _, err = c.client.Accounts.VerifyCredentials(verifyParams)
-    if err != nil {        
-        return nil, err
-    }
+	// connect to Twitter API
+	config := oauth1.NewConfig(s.ConsumerKey, s.ConsumerSecret)
+	token := oauth1.NewToken(s.AccessToken, s.AccessTokenSecret)
+	// OAuth1 http.Client will automatically authorize Requests
+	httpClient := config.Client(oauth1.NoContext, token)
+	// Twitter client
+	c := &Client{}
+	c.client = t.NewClient(httpClient)
 
-    return c, nil
+	// Verify Credentials
+	// Not really necessary - just debug so comment out after everything works
+	verifyParams := &t.AccountVerifyParams{
+		SkipStatus:   t.Bool(true),
+		IncludeEmail: t.Bool(true),
+	}
+	_, _, err = c.client.Accounts.VerifyCredentials(verifyParams)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }
 
 func (c *Client) DeleteTweet(id int64) error {
 	// bye bye tweet!!!!
 	destroyParams := &t.StatusDestroyParams{}
-    _, _, err := c.client.Statuses.Destroy(id, destroyParams)
-    return err
+	_, _, err := c.client.Statuses.Destroy(id, destroyParams)
+	return err
 }
 
 func (c *Client) DeleteLike(id int64) error {
 	// This is different from tweets -> FavoriteDestroyParams
-	destroyParams := &t.FavoriteDestroyParams{ ID: id}
+	destroyParams := &t.FavoriteDestroyParams{ID: id}
 	_, _, err := c.client.Favorites.Destroy(destroyParams)
 	return err
 }
@@ -116,20 +116,20 @@ func (c *Client) DeleteDM(id string) error {
 
 // debug query to check the API limits - never managed to have issues deleting 70k or so tweets
 func (c *Client) Limits() {
-    rateLimits, _, err := c.client.RateLimits.Status(&t.RateLimitParams{Resources: []string{"statuses", "users"}})
-    if err != nil {
-        fmt.Printf("Error: %s", err.Error())
-    } else {
-        for k, v := range rateLimits.Resources.Statuses {
-            fmt.Printf("Limit Key: %s -> Value: %+v\n", k, v.Limit)
-            fmt.Printf("Remaining Key: %s -> Value: %+v\n", k, v.Remaining)
-            fmt.Printf("Reset Key: %s -> Value: %+v\n", k, v.Reset)
-        }
+	rateLimits, _, err := c.client.RateLimits.Status(&t.RateLimitParams{Resources: []string{"statuses", "users"}})
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	} else {
+		for k, v := range rateLimits.Resources.Statuses {
+			fmt.Printf("Limit Key: %s -> Value: %+v\n", k, v.Limit)
+			fmt.Printf("Remaining Key: %s -> Value: %+v\n", k, v.Remaining)
+			fmt.Printf("Reset Key: %s -> Value: %+v\n", k, v.Reset)
+		}
 
-        for k, v := range rateLimits.Resources.Users {
-            fmt.Printf("Limit Key: %s -> Value: %+v\n", k, v.Limit)
-            fmt.Printf("Remaining Key: %s -> Value: %+v\n", k, v.Remaining)
-            fmt.Printf("Reset Key: %s -> Value: %+v\n", k, v.Reset)
-        }
-    }
+		for k, v := range rateLimits.Resources.Users {
+			fmt.Printf("Limit Key: %s -> Value: %+v\n", k, v.Limit)
+			fmt.Printf("Remaining Key: %s -> Value: %+v\n", k, v.Remaining)
+			fmt.Printf("Reset Key: %s -> Value: %+v\n", k, v.Reset)
+		}
+	}
 }

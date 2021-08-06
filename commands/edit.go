@@ -9,7 +9,7 @@
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- 
+
  * 1. Redistributions of source code must retain the above copyright notice, this list
  * of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -39,18 +39,18 @@ package commands
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/boltdb/bolt"
+	"github.com/spf13/cobra"
 )
 
 var editCmd = &cobra.Command{
-  Use:   "edit",
-  Short: "Removes tweets, likes, direct messages from the database",
-  Long:  `Removes tweets, likes, dms from local database`,
+	Use:   "edit",
+	Short: "Removes tweets, likes, direct messages from the database",
+	Long:  `Removes tweets, likes, dms from local database`,
 }
 
 var tweetsEditCmd = &cobra.Command{
-	Use:	"tweet tweetID",
+	Use:  "tweet tweetID",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		targetID := args[0]
@@ -90,7 +90,7 @@ var tweetsEditCmd = &cobra.Command{
 }
 
 var likesEditCmd = &cobra.Command{
-	Use:	"like likeID",
+	Use:  "like likeID",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		targetID := args[0]
@@ -129,7 +129,7 @@ var likesEditCmd = &cobra.Command{
 }
 
 var dmsEditCmd = &cobra.Command{
-	Use:	"dm dmID",
+	Use:  "dm dmID",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		targetID := args[0]
@@ -164,12 +164,12 @@ var dmsEditCmd = &cobra.Command{
 		} else {
 			fmt.Printf("[-] Direct message with ID %s does not exist in database.\n", args[0])
 		}
-	},	
+	},
 }
 
 func init() {
-  rootCmd.AddCommand(editCmd)
-  editCmd.AddCommand(tweetsEditCmd)
-  editCmd.AddCommand(likesEditCmd)
-  editCmd.AddCommand(dmsEditCmd)
+	rootCmd.AddCommand(editCmd)
+	editCmd.AddCommand(tweetsEditCmd)
+	editCmd.AddCommand(likesEditCmd)
+	editCmd.AddCommand(dmsEditCmd)
 }

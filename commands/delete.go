@@ -9,7 +9,7 @@
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- 
+
  * 1. Redistributions of source code must retain the above copyright notice, this list
  * of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -39,23 +39,23 @@ package commands
 
 import (
 	"fmt"
-	"strconv"
-	"github.com/spf13/cobra"
 	"github.com/boltdb/bolt"
-    "github.com/schollz/progressbar/v3"
-    "github.com/gdbinit/twitterwipe/twitter"
+	"github.com/gdbinit/twitterwipe/twitter"
+	"github.com/schollz/progressbar/v3"
+	"github.com/spf13/cobra"
+	"strconv"
 )
 
 var limit int
 
 var deleteCmd = &cobra.Command{
-  Use:   "delete",
-  Short: "Delete tweets, likes, direct messages",
-  Long:  `Delete all tweets, likes, dms`,
+	Use:   "delete",
+	Short: "Delete tweets, likes, direct messages",
+	Long:  `Delete all tweets, likes, dms`,
 }
 
 var tweetsDeleteCmd = &cobra.Command{
-	Use:	"tweets",
+	Use: "tweets",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("[+] Deleting tweets...")
 		db, err := bolt.Open("tweets.db", 0600, nil)
@@ -93,23 +93,23 @@ var tweetsDeleteCmd = &cobra.Command{
 			for k, _ := c.First(); k != nil; k, _ = c.Next() {
 				// key is []byte type
 				id_str := string(k)
-        		id, err := strconv.Atoi(id_str)
-        		if err != nil {
-            		panic(err)
-        		}
+				id, err := strconv.Atoi(id_str)
+				if err != nil {
+					panic(err)
+				}
 
-		        // bye bye tweet!!!!
-        		err = client.DeleteTweet(int64(id))
-        		bar.Add(1)
-        		if err != nil {
-            		fmt.Printf("[-] Error deleting tweet %s from twitter.com: %s\n", id_str, err.Error())
-        		} else {
-            		toDelete = append(toDelete, id_str)
-            		deletedCount++
-            		if deletedCount >= totalWork {
-            			break
-            		}
-        		}
+				// bye bye tweet!!!!
+				err = client.DeleteTweet(int64(id))
+				bar.Add(1)
+				if err != nil {
+					fmt.Printf("[-] Error deleting tweet %s from twitter.com: %s\n", id_str, err.Error())
+				} else {
+					toDelete = append(toDelete, id_str)
+					deletedCount++
+					if deletedCount >= totalWork {
+						break
+					}
+				}
 			}
 			return nil
 		})
@@ -167,22 +167,22 @@ var likesDeleteCmd = &cobra.Command{
 			c := b.Cursor()
 			for k, _ := c.First(); k != nil; k, _ = c.Next() {
 				id_str := string(k)
-        		id, err := strconv.Atoi(id_str)
-        		if err != nil {
-            		panic(err)
-        		}
-        		// This is different from tweets -> FavoriteDestroyParams
-        		bar.Add(1)
-        		err = client.DeleteLike(int64(id))
-        		if err != nil {
-            		fmt.Printf("[-] Error deleting like %s from twitter.com: %s\n", id_str, err.Error())
-        		} else {
-            		toDelete = append(toDelete, id_str)
-            		deletedCount++
-            		if deletedCount >= totalWork {
-            			break
-            		}
-        		}
+				id, err := strconv.Atoi(id_str)
+				if err != nil {
+					panic(err)
+				}
+				// This is different from tweets -> FavoriteDestroyParams
+				bar.Add(1)
+				err = client.DeleteLike(int64(id))
+				if err != nil {
+					fmt.Printf("[-] Error deleting like %s from twitter.com: %s\n", id_str, err.Error())
+				} else {
+					toDelete = append(toDelete, id_str)
+					deletedCount++
+					if deletedCount >= totalWork {
+						break
+					}
+				}
 			}
 			return nil
 		})
@@ -241,18 +241,18 @@ var dmsDeleteCmd = &cobra.Command{
 			c := b.Cursor()
 			for k, _ := c.First(); k != nil; k, _ = c.Next() {
 				id_str := string(k)
-        		// This is different from tweets -> FavoriteDestroyParams
-        		bar.Add(1)
-        		err = client.DeleteDM(id_str)
-        		if err != nil {
-            		fmt.Printf("[-] Error deleting DM %s from twitter.com: %s\n", id_str, err.Error())
-        		} else {
-            		toDelete = append(toDelete, id_str)
-            		deletedCount++
-            		if deletedCount >= totalWork {
-            			break
-            		}
-        		}
+				// This is different from tweets -> FavoriteDestroyParams
+				bar.Add(1)
+				err = client.DeleteDM(id_str)
+				if err != nil {
+					fmt.Printf("[-] Error deleting DM %s from twitter.com: %s\n", id_str, err.Error())
+				} else {
+					toDelete = append(toDelete, id_str)
+					deletedCount++
+					if deletedCount >= totalWork {
+						break
+					}
+				}
 			}
 			return nil
 		})
@@ -272,11 +272,11 @@ var dmsDeleteCmd = &cobra.Command{
 }
 
 func init() {
-  rootCmd.AddCommand(deleteCmd)
-  deleteCmd.AddCommand(tweetsDeleteCmd)
-  deleteCmd.AddCommand(likesDeleteCmd)
-  deleteCmd.AddCommand(dmsDeleteCmd)
-  deleteCmd.PersistentFlags().IntVarP(&limit, "limit", "l", 0, "limit the number of items to delete [default: unlimited]")
+	rootCmd.AddCommand(deleteCmd)
+	deleteCmd.AddCommand(tweetsDeleteCmd)
+	deleteCmd.AddCommand(likesDeleteCmd)
+	deleteCmd.AddCommand(dmsDeleteCmd)
+	deleteCmd.PersistentFlags().IntVarP(&limit, "limit", "l", 0, "limit the number of items to delete [default: unlimited]")
 }
 
 func getBucketEntries(db *bolt.DB, bucket string) int {

@@ -9,7 +9,7 @@
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- 
+
  * 1. Redistributions of source code must retain the above copyright notice, this list
  * of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -39,20 +39,20 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
-  Use:   "twitterwipe",
-  Short: "Utility to delete Twitter content",
-  Long: `Utility to delete Twitter content
+	Use:   "twitterwipe",
+	Short: "Utility to delete Twitter content",
+	Long: `Utility to delete Twitter content
 Able to delete tweets, likes, and direct messages.`,
 }
 
 func Execute() {
-  if err := rootCmd.Execute(); err != nil {
-    fmt.Printf("[-] %s\n", err.Error())
-    os.Exit(1)
-  }
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Printf("[-] %s\n", err.Error())
+		os.Exit(1)
+	}
 }
